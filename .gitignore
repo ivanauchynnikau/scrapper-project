@@ -1,0 +1,68 @@
+# Compiled source #
+########################
+*.sqlite3
+
+# Compiled source #
+########################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.pyc
+
+# Python extensions
+#########################
+.venv/
+.python-version
+.coverage
+coverage.xml
+covetage_html/
+
+# Docker
+#########################
+.data/
+docker-compose.override.yml
+
+# Eclipse generated files #
+#########################
+.project
+.pydevproject
+.metadata
+.settings
+
+# PyCharm project folder
+#########################
+.idea
+.vagrant
+
+# OS generated files #
+#########################
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+*~
+~*
+
+# Linters
+#########################
+.scannerwork/
+junit_report.xml
+flake8_report.txt
+pip_outdated.txt
+
+
+# Django
+#########################
+# media
+*.log
+.env
+.env.*
+!.env.local
+!.env.test
+
+# Front-end
+#########################
+node_modules/
