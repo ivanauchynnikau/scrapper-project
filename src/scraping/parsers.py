@@ -1,12 +1,21 @@
 import requests
 import codecs
 from bs4 import BeautifulSoup as bs
+from random import randint
 
+__all__ = ('work', 'rabota')  # TODO что такое all ???
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36',
-    'Accept': '*/*',
-}
+accept = '*/*'
+headers = [{
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
+    'Accept': accept,
+}, {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)',
+    'Accept': accept,
+}, {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20130401 Firefox/31.0',
+    'Accept': accept,
+}]
 
 def work(url):
     jobs = []
@@ -14,10 +23,11 @@ def work(url):
 
     domain = 'https://www.work.ua'
     url = 'https://www.work.ua/jobs-kyiv-python/'
-    resp = requests.get(url, headers=headers)
+    resp = requests.get(url, headers=headers[randint(0, 2)])
 
     if resp.status_code == 200:
         soup = bs(resp.content, 'html.parser')
+
         main_div = soup.find('div', id='pjax-job-list')
         if main_div:
             div_list = main_div.find_all('div', attrs={'class': 'job-link'})
@@ -48,7 +58,7 @@ def rabota(url):
     errors = []
     domain = 'https://www.radota.ua'
 
-    resp = requests.get(url, headers=headers)
+    resp = requests.get(url, headers=headers[randint(0, 2)])
 
     if resp.status_code == 200:
         soup = bs(resp.content, 'html.parser')
@@ -78,7 +88,7 @@ def rabota(url):
     return jobs, errors
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # TODO что такое __name__ ???
     url = 'https://rabota.ua/jobsearch/vacancy_list?regionId=1&keyWords=python'
     jobs, errors = rabota(url)
     h = codecs.open('work.json', 'w', 'utf-8')  # 'w' work with file in write mode

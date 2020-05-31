@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import FindForm
-from .models import Vacancies
+from .models import Vacancy
 
 
 def home_view(request):
@@ -15,5 +15,5 @@ def home_view(request):
         elif language:
             _filter['language__slug'] = language
 
-    qs = Vacancies.objects.filter(**_filter)  # TODO зачем тут **_filter ???
+    qs = Vacancy.objects.filter(**_filter)  # TODO зачем тут **_filter ???
     return render(request, 'scraping/home.html', {'object_list': qs, 'form': form})

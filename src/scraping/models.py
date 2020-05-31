@@ -38,20 +38,21 @@ class Language(models.Model):
         super().save(*args, **kwargs)  # TODO зачем передвавать args kwargs ???
 
 
-class Vacancies(models.Model):
-    url = models.URLField(max_length=50, unique=True)
-    title = models.CharField(max_length=250, verbose_name='Название вакансии')
-    company = models.CharField(max_length=250, verbose_name='Название компании')
+class Vacancy(models.Model):
+    url = models.URLField(unique=True)
+    title = models.CharField(max_length=250, verbose_name='Заголовок вакансии')
+    company = models.CharField(max_length=250, verbose_name='Компания')
     description = models.TextField(verbose_name='Описание вакансии')
-    slug = models.CharField(max_length=50, blank=True, unique=True)
-    city = models.ForeignKey('City', on_delete=models.CASCADE, verbose_name='Город')
+    city = models.ForeignKey('City', on_delete=models.CASCADE,
+                             verbose_name='Город', related_name='vacancies')
     language = models.ForeignKey('Language', on_delete=models.CASCADE,
                                  verbose_name='Язык программирования')
-    timestamp = models.DateField(auto_now_add=True, verbose_name='Время добавления')
+    timestamp = models.DateField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Вакансия'
         verbose_name_plural = 'Вакансии'
+        ordering = ['-timestamp']
 
     def __str__(self):
         return self.title
