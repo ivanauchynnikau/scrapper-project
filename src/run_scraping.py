@@ -9,7 +9,7 @@ django.setup()
 
 from scraping.parsers import *
 from django.db import DatabaseError
-from scraping.models import Vacancy, City, Language
+from scraping.models import Vacancy, City, Language, Error
 
 parsers = (
     (work, 'https://www.work.ua/jobs-kyiv-python/'),
@@ -32,9 +32,10 @@ for job in jobs:
     try:
         v.save()
     except DatabaseError:
-        print('error')
-        pass
+        pass  # просто скипаем ошибку
 
+if errors:
+    er = Error(data=errors)
 
 #  Write to file
 import codecs

@@ -1,7 +1,7 @@
 from django.db import models
 
 from scraping.utils import from_cyrillic_to_eng
-
+import jsonfield
 
 class City(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название населенного пункта', unique=True)
@@ -56,3 +56,12 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Error(models.Model):
+    title = models.CharField(max_length=250, verbose_name='Заголовок ошибки')
+    data = jsonfield.JSONField(verbose_name='Детали по ошибке')
+
+    class Meta:
+        verbose_name = 'Ошибка'
+        verbose_name_plural = 'Ошибки'
