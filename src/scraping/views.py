@@ -7,10 +7,9 @@ def home_view(request):
     form = FindForm()
     city = request.GET.get('city')
     language = request.GET.get('language')
+    _filter = {}
 
     if city or language:
-        _filter = {}
-
         if city:
             _filter['city__slug'] = city
         elif language:
