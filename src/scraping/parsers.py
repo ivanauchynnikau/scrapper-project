@@ -3,7 +3,7 @@ import codecs
 from bs4 import BeautifulSoup as bs
 from random import randint
 
-__all__ = ('work', 'rabota')  # TODO что такое all ???
+__all__ = ('work', 'rabota')  # TODO что такое __all__ ???
 
 accept = '*/*'
 headers = [{
@@ -17,12 +17,15 @@ headers = [{
     'Accept': accept,
 }]
 
-def work(url):
+
+def work(url, city=None, language=None):
     jobs = []
     errors = []
 
+    if not url:
+        return jobs, errors
+
     domain = 'https://www.work.ua'
-    url = 'https://www.work.ua/jobs-kyiv-python/'
     resp = requests.get(url, headers=headers[randint(0, 2)])
 
     if resp.status_code == 200:
@@ -44,7 +47,7 @@ def work(url):
                     company = logo['alt']
 
                 jobs.append({'title': title, 'url': domain + href, 'description': content,
-                             'company': company})
+                             'company': company, 'city_id': city, 'language_id': language})
         else:
             errors.append({'url': url, 'title': 'Main div does not exists'})
     else:
@@ -53,9 +56,13 @@ def work(url):
     return jobs, errors
 
 
-def rabota(url):
+def rabota(url, city=None, language=None):
     jobs = []
     errors = []
+
+    if not url:
+        return jobs, errors
+
     domain = 'https://www.radota.ua'
 
     resp = requests.get(url, headers=headers[randint(0, 2)])
@@ -79,7 +86,7 @@ def rabota(url):
                     company = company_div.text
 
                 jobs.append({'title': title, 'url': domain + href, 'description': content,
-                             'company': company})
+                             'company': company, 'city_id': city, 'language_id': language})
         else:
             errors.append({'url': url, 'title': 'Table does not exists'})
     else:

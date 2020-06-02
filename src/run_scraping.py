@@ -1,75 +1,95 @@
+import asyncio
+import codecs
 import os
 import sys
-import django
-from django.contrib.auth import get_user_model
+import datetime as dt
 
-project = os.path.dirname(os.path.abspath('manage.py'))
-sys.path.append(project)
+from django.contrib.auth import get_user_model
+from django.db import DatabaseError
+
+proj = os.path.dirname(os.path.abspath('manage.py'))
+sys.path.append(proj)
 os.environ["DJANGO_SETTINGS_MODULE"] = "scrappingservice.settings"
+
+import django
 django.setup()
 
 from scraping.parsers import *
-from django.db import DatabaseError
-from scraping.models import Vacancy, City, Language, Error, Url
+from scraping.models import Vacancy, Error, Url
 
 User = get_user_model()
 
 parsers = (
-    (work, 'https://www.work.ua/jobs-kyiv-python/'),
-    (rabota, 'https://rabota.ua/jobsearch/vacancy_list?regionId=1&keyWords=python'),
+    (work, 'work'),
+    (rabota, 'rabota')
 )
+
+jobs, errors = [], []
 
 
 def get_settings():
     qs = User.objects.filter(send_email=True).values()  # .values() вернет список словарей (массивов
-    settings_list = set((q['city_id'], q['language_id']) for q in qs)  # TODO что такое set()
-    return settings_list
+    settings_lst = set((q['city_id'], q['language_id']) for q in qs)  # TODO что такое set()
+    return settings_lst
 
 
-def get_urls(_settings):  # TODO зачем _ в начале аргумента?
+def get_urls(_settings): # TODO зачем _ в начале аргумента?
     qs = Url.objects.all().values()
-    url_dictionary = {(q['city_id'], q['language_id']): q['url_data'] for q in qs}
+    url_dct = {(q['city_id'], q['language_id']): q['url_data'] for q in qs}
     urls = []
-
     for pair in _settings:
-        tmp = {}
-        tmp['city'] = pair[0]
-        tmp['language'] = pair[1]
-        tmp['url_data'] = url_dictionary[pair]
-        urls.append(tmp)
-
+        if pair in url_dct:
+            tmp = {}
+            tmp['city'] = pair[0]
+            tmp['language'] = pair[1]
+            tmp['url_data'] = url_dct[pair]
+            urls.append(tmp)
     return urls
 
 
+async def main(value):
+    func, url, city, language = value
+    job, err = await loop.run_in_executor(None, func, url, city, language)
+    errors.extend(err)
+    jobs.extend(job)
+
 settings = get_settings()
-u = get_urls(settings)
+url_list = get_urls(settings)
 
+loop = asyncio.get_event_loop()
+tmp_tasks = [(func, data['url_data'][key], data['city'], data['language'])
+             for data in url_list
+             for func, key in parsers]
+tasks = asyncio.wait([loop.create_task(main(f)) for f in tmp_tasks]) # что это за синтаксис main(f)) for f in tmp_tasks
 
-city = City.objects.filter(slug='kiev').first()
-language = Language.objects.filter(slug='python').first()
+# for data in url_list:
+#
+#     for func, key in parsers:
+#         url = data['url_data'][key]
+#         j, e = func(url, city=data['city'], language=data['language'])
+#         jobs += j
+#         errors += e
 
-jobs, errors = [], []
-
-for func, url in parsers:
-    j, e = func(url)
-    jobs += j
-    errors += e
+loop.run_until_complete(tasks)
+loop.close()
 
 for job in jobs:
-    v = Vacancy(**job, city=city, language=language)
-
+    v = Vacancy(**job)
     try:
         v.save()
     except DatabaseError:
-        pass  # просто скипаем ошибку
-
+        pass
 if errors:
-    er = Error(data=errors)
+    qs = Error.objects.filter(timestamp=dt.date.today())
+    if qs.exists():
+        err = qs.first()
+        err.data.update({'errors': errors})
+        err.save()
+    else:
+        er = Error(data=f'errors:{errors}').save()
 
 #  Write to file
-import codecs
-
-# h = codecs.open('work.json', 'w', 'utf-8')  # 'w' work with file in write mode
-# h.write(str(jobs))  # write to file
+# h = codecs.open('work.txt', 'w', 'utf-8')
+# h.write(str(jobs))
 # h.close()
 
