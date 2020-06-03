@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-10 offset-1">
+        <h2 class="text-center">Welcome new user {{ new_user.email }}.</h2>
+        <h4 class="text-center">
+          You are successful registered in system, now you able to
+          <a href="{% url 'accounts:login' %}">login</a>
+        </h4>
+      </div>
+    </div>
+  </div>
+{% endblock %}
