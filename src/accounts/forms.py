@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import check_password
 
+from scraping.models import City, Language
+
 User = get_user_model()
 
 
@@ -34,11 +36,11 @@ class UserLoginForm(forms.Form):
 
 
 class UserRegistrationForm(forms.ModelForm):
-    email = forms.EmailField(label='Введите имэйл',
+    email = forms.EmailField(label='Enter email',
                              widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(label='Введите пароль',
+    password = forms.CharField(label='Enter password',
                                widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    password2 = forms.CharField(label='Введите пароль ещё раз',
+    password2 = forms.CharField(label='Repeat password',
                                 widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
     class Meta:
@@ -53,7 +55,26 @@ class UserRegistrationForm(forms.ModelForm):
         return data['password2']
 
 
+class UserUpdateForm(forms.Form):
+    city = forms.ModelChoiceField(
+        queryset=City.objects.all(), to_field_name='slug', required=True,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='City'
+    )
+    language = forms.ModelChoiceField(
+        queryset=Language.objects.all(), to_field_name='slug', required=True,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Specialization'
+    )
+    send_email = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label='Subscribe to emails'
+    )
 
+    class Meta:
+        model = User
+        fields = ('city', 'language', 'send_email')
 
 
 

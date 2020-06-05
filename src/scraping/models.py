@@ -9,12 +9,12 @@ def default_urls():
 
 
 class City(models.Model):
-    name = models.CharField(max_length=50, verbose_name='Название населенного пункта', unique=True)
+    name = models.CharField(max_length=50, verbose_name='City', unique=True)
     slug = models.CharField(max_length=50, blank=True, unique=True)
 
     class Meta:
-        verbose_name = 'Населенный пункта'
-        verbose_name_plural = 'Населенные пункты'
+        verbose_name = 'City'
+        verbose_name_plural = 'Cities'
 
     def __str__(self):
         return self.name
@@ -27,12 +27,12 @@ class City(models.Model):
 
 class Language(models.Model):
     name = models.CharField(max_length=50,
-                            verbose_name='Название языка программирования', unique=True)
+                            verbose_name='Programming language', unique=True)
     slug = models.CharField(max_length=50, blank=True, unique=True)
 
     class Meta:
-        verbose_name = 'Язык программирования'
-        verbose_name_plural = 'Языки программирования'
+        verbose_name = 'Programming language'
+        verbose_name_plural = 'Programming languages'
 
     def __str__(self):
         return self.name
@@ -45,18 +45,18 @@ class Language(models.Model):
 
 class Vacancy(models.Model):
     url = models.URLField(unique=True)
-    title = models.CharField(max_length=250, verbose_name='Заголовок вакансии')
-    company = models.CharField(max_length=250, verbose_name='Компания')
-    description = models.TextField(verbose_name='Описание вакансии')
+    title = models.CharField(max_length=250, verbose_name='Vacancy title')
+    company = models.CharField(max_length=250, verbose_name='Company')
+    description = models.TextField(verbose_name='Vacancy description')
     city = models.ForeignKey('City', on_delete=models.CASCADE,
-                             verbose_name='Город', related_name='vacancies')
+                             verbose_name='City', related_name='vacancies')
     language = models.ForeignKey('Language', on_delete=models.CASCADE,
-                                 verbose_name='Язык программирования')
+                                 verbose_name='Programming language')
     timestamp = models.DateField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Вакансия'
-        verbose_name_plural = 'Вакансии'
+        verbose_name = 'Vacancy'
+        verbose_name_plural = 'Vacancies'
         ordering = ['-timestamp']
 
     def __str__(self):
@@ -64,19 +64,19 @@ class Vacancy(models.Model):
 
 
 class Error(models.Model):
-    title = models.CharField(max_length=250, verbose_name='Заголовок ошибки')
-    data = jsonfield.JSONField(verbose_name='Детали по ошибке')
+    title = models.CharField(max_length=250, verbose_name='Error title')
+    data = jsonfield.JSONField(verbose_name='Error details')
 
     class Meta:
-        verbose_name = 'Ошибка'
-        verbose_name_plural = 'Ошибки'
+        verbose_name = 'Error'
+        verbose_name_plural = 'Errors'
 
 
 class Url(models.Model):
     city = models.ForeignKey('City', on_delete=models.CASCADE,
-                             verbose_name='Город')
+                             verbose_name='City')
     language = models.ForeignKey('Language', on_delete=models.CASCADE,
-                                 verbose_name='Язык программирования')
+                                 verbose_name='Programming language')
     url_data = jsonfield.JSONField(default=default_urls)
 
     class Meta:
