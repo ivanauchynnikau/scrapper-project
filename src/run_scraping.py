@@ -33,7 +33,7 @@ def get_settings():
     return settings_lst
 
 
-def get_urls(_settings): # TODO зачем _ в начале аргумента?
+def get_urls(_settings):  # TODO зачем _ в начале аргумента?
     qs = Url.objects.all().values()
     url_dct = {(q['city_id'], q['language_id']): q['url_data'] for q in qs}
     urls = []

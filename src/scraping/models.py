@@ -64,12 +64,15 @@ class Vacancy(models.Model):
 
 
 class Error(models.Model):
-    title = models.CharField(max_length=250, verbose_name='Error title')
+    timestamp = models.DateField(auto_now_add=True)
     data = jsonfield.JSONField(verbose_name='Error details')
 
     class Meta:
         verbose_name = 'Error'
         verbose_name_plural = 'Errors'
+
+    def __str__(self):
+        return str(self.timestamp)
 
 
 class Url(models.Model):
