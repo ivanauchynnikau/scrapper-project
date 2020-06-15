@@ -12,6 +12,7 @@ django.setup()
 
 from scraping.models import Vacancy
 from scraping.models import Error
+from scraping.models import Url
 from scrappingservice.settings import EMAIL_HOST_USER
 
 ADMIN_USER = EMAIL_HOST_USER
@@ -63,13 +64,14 @@ if users_dct:
             msg.send()
 
 
+# send emails with errors to admin
 qs = Error.objects.filter(timestamp=today)
+subject = ''
+errors_html = ''
 
 if qs.exists():
     error = qs.first()
     errors = error.data
-
-    errors_html = ''
 
     for item in errors:
         errors_html += f'<p>{item["title"]}</p>'
@@ -78,6 +80,21 @@ if qs.exists():
 
     subject = f'Scraping error report {today}'
 
+
+qs = Url.objects.all().values('city', 'language')
+urls_dct = {(i['city'], i['language']): True for i in qs}
+
+urls_errors = ''
+
+for keys in users_dct.keys():
+    if keys not in urls_dct:
+        urls_errors += f'<p>For {keys[0]}, {keys[1]} <b>No Urls in admin panel</b></p></br>'
+
+if urls_errors:
+    subject += ' Undefined urls'
+    errors_html += urls_errors
+
+if subject:
     msg = EmailMultiAlternatives(subject, subject, from_email, [ADMIN_USER])
     msg.attach_alternative(errors_html, "text/html")
     msg.send()
