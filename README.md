@@ -14,7 +14,7 @@ virtual environments easily. Follow those instructions https://github.com/pyenv/
 to install `pyenv`. After installing, run this:
 
     pyenv install 3.6.1
-    pyenv virtualenv 2.7.15 scrapping-service-3.6.1
+    pyenv virtualenv 3.6.1 scrapping-service-3.6.1
     pyenv local scrapping-service-3.6.1
     
 ### 3. Activate virtual environment
