@@ -18,7 +18,7 @@ to install `pyenv`. After installing, run this:
     pyenv local scrapping-service-3.6.1
     
 ### 3. Activate virtual environment
-    source /home/ivan/.pyenv/versions/scrapping-service-3.6.1/bin/activate
+    source /home/[YOUR_USERNAME]/.pyenv/versions/scrapping-service-3.6.1/bin/activate
     
     
 ### 4. Install requirements
